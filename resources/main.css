@@ -16,3 +16,11 @@ body{
     width: 40%;  
     padding: 5px;  
 }
+
+.legendTitle{
+    font-size: 15px;
+    font-weight: bold;
+}
+.legendAxis{
+    font-size: 9px;
+}

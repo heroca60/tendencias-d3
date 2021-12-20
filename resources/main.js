@@ -34,6 +34,17 @@ const colorScale = d3.scaleThreshold()
     .domain([100000, 500000, 1000000, 5000000, 10000000, 25000000, 50000000])
     .range(d3.schemeReds[5]);
 
+//*****************Begin: Legenda del Mapa *******************/    
+const legendWidth = Math.min(width*0.50, 400);
+// Asignando el svg para la escala de datos
+const svg_legend = svg.append("g")
+    .attr("class", "legendWrapper")
+    .attr("transform",
+        "translate(" + (width*0.73) + "," + (16) + ")");
+
+//*****************End:  Legenda del Mapa *******************/
+
+
 //*****************BAR PLOT*******************/
 // definiendo margenes y ancho y largo del barplot
 const margin = {
@@ -127,8 +138,12 @@ Promise.all([
             .on("mouseleave", mouseLeave)
             //Cuando el usuario proporciona click sobre el polígono se redibuja el barplot
             .on("click", function (d, i) {
-                drawBarplot(i.id)
+                drawBarplot(i.id);
+                drawLegendPointer(i.id);
             })
+        
+        // Dibuja la legenda del Mapa
+        drawMapLegend();
     })
 
 function drawBarplot(i) {
@@ -189,4 +204,82 @@ function drawBarplot(i) {
         .attr("height", d => height_bp - y(d.value))
         .attr("fill", "rgb(223, 163, 0, 0.863)")
 
+}
+
+// Función encargada de dibujar la legenda del mapa
+function drawMapLegend(){
+    /* -- Definición del gradiente de forma lineal -- */
+    var def_lg = svg.append("defs")
+        .append("linearGradient")
+        .attr("id", "def_linear_gradient")
+        .attr("x1", "0%").attr("y1", "0%")
+	    .attr("x2", "100%").attr("y2", "0%");
+    // Color de finalización del gradiente
+    def_lg.append("stop")
+        .attr("offset", "0%")
+        .style("stop-color", d3.max(colorScale.range()))
+        .style("stop-opacity", 1)
+    // Color de inicio del gradiente
+    def_lg.append("stop")
+        .attr("offset", "100%")
+        .style("stop-color", d3.min(colorScale.range()))
+        .style("stop-opacity", 1)
+    /* -- */
+
+    /* -- Dibujando el rectángulo -- */
+    svg_legend.append("rect")
+        .attr("class", "legendRect")
+        .attr("x", -legendWidth/2)
+        .attr("y", 0)
+        .attr("width", legendWidth)
+        .attr("height", 5)
+        .style("fill", "url(#def_linear_gradient)");
+    /* -- */
+    
+    /* -- Título de la leyenda -- */
+    svg_legend.append("text")
+        .attr("class", "legendTitle")
+        .attr("x", 0)
+        .attr("y", -5)
+        .style("text-anchor", "middle")
+        .text("Cantidad de casos de COVID-19 2020-2021");
+    /* -- */
+
+    /* -- Leyenda de la escala de los datos -- */
+    // Escala para cantidades
+    var Leg_xScale = d3.scaleLinear()
+        .domain([0,50000000])
+        .range([-legendWidth/2, legendWidth/2])
+    // Axis para dar formato a los datos (abreviación de Millones)
+    var Leg_xAxis = d3.axisBottom(Leg_xScale).tickFormat(function(d){
+        return d/1000000 + "MM";
+    })
+
+    //Configura el eje X
+    svg_legend.append("g")
+        .attr("class", "legendAxis")
+        .attr("transform", "translate(0," + (5) + ")")
+        .call(Leg_xAxis);
+    /* -- */
+}
+
+// Función drawLegendPointer: dibuja sobre la escala de color
+// un puntero con la cantidad de casos para una rápida identificación.
+function drawLegendPointer(i){
+    // Filtra los datos específicos del país seleccionado
+    let res = COVID.find(pais => pais.Country_code === i);
+    // El valor a representar en el apuntados, es la suma de los nuevos casos
+    var value = parseInt(res.New_cases) + parseInt(res.New_deaths);
+
+    /* -- Leyenda de la escala de los datos -- */
+    var PtScale = d3.scaleLinear()
+        .range([-legendWidth/2, legendWidth/2])
+        .domain([0, 50000000]);
+    // Definición del objeto apuntador (Diamante)
+    var symb = d3.symbol().type(d3.symbolDiamond).size(30);
+    // Dibuja el apuntador 
+    svg_legend.selectAll("path")
+        .attr("d", symb)
+        .attr("fill", "black")
+        .attr("transform", "translate(" + PtScale(value) + ", -2)");
 }
