@@ -6,8 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Load d3.js -->
-    <!-- Load d3.js -->
-    <!-- Load d3.js -->
     <script src="https://d3js.org/d3.v6.js"></script>
     <script defer src="resources/main.js"></script>
     <!-- CSS only -->
@@ -18,11 +16,28 @@
 </head>
 
 <body>
-    <div>
-        <h1>
-            Title
-        </h1>
+    
+    <div class="collapse" id="navbarToggleExternalContent">
+        <div class="bg-dark p-4">
+            <h5 class="text-white h4">Collapsed content</h5>
+            <span class="text-muted">Toggleable via the navbar brand.</span>
+        </div>
     </div>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </nav>
+    <div>
+        <h2>
+            COVID-19
+        </h2>
+    </div>
+    <br>
     <div class="left">
         <!-- Create an element where the map will take place -->
         <svg id="my_dataviz" width="700" height="600">
@@ -32,7 +47,28 @@
         </div>
     </div>
     <div class="right" id="barplot">
-    </div>
+        <p id="barplotTitle"></p>
+        <svg id="my_barplot">
+        </svg>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">Contagiados</th>
+                    <td><p id="contagiados"></p></td>
+                </tr>
+                <tr>
+                    <th scope="row">Fallecidos</th>
+                    <td><p id="fallecidos"></p></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>    
 </body>
 
 </html>

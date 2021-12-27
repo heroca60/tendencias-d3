@@ -1,5 +1,16 @@
 body{
-    text-align: center;    
+    text-align: center;        
+}
+div{
+    border-radius: 10px;    
+}
+
+p{
+    margin: 0px;
+}
+
+h2{
+    font-weight: bold;
 }
 
 .left{
@@ -10,6 +21,7 @@ body{
 }
 
 .right{
+    background-color: beige;
     text-align: center;
     float: left;
     position: relative;

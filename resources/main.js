@@ -35,12 +35,12 @@ const colorScale = d3.scaleThreshold()
     .range(d3.schemeReds[5]);
 
 //*****************Begin: Legenda del Mapa *******************/    
-const legendWidth = Math.min(width*0.50, 400);
+const legendWidth = Math.min(width * 0.50, 400);
 // Asignando el svg para la escala de datos
 const svg_legend = svg.append("g")
     .attr("class", "legendWrapper")
     .attr("transform",
-        "translate(" + (width*0.73) + "," + (16) + ")");
+        "translate(" + (width * 0.73) + "," + (16) + ")");
 
 //*****************End:  Legenda del Mapa *******************/
 
@@ -57,13 +57,14 @@ const margin = {
     height_bp = 400 - margin.top - margin.bottom;
 
 // Asignando el svg para el barplot sobre el div #barplot
-const svg_bp = d3.select("#barplot")
-    .append("svg")
+const svg_bp = d3.select("#my_barplot")
+    //    .append("svg")
     .attr("width", width_bp + margin.left + margin.right)
     .attr("height", height_bp + margin.top + margin.bottom)
     .append("g")
     .attr("transform",
         `translate(${margin.left},${margin.top})`);
+
 
 // Inicializando valores para el eje X
 const x = d3.scaleBand()
@@ -80,6 +81,7 @@ const yAxis = svg_bp.append("g")
     .attr("class", "myYaxis")
 
 //*****************BAR PLOT*******************/
+
 
 // Cargando información externa
 Promise.all([
@@ -141,7 +143,7 @@ Promise.all([
                 drawBarplot(i.id);
                 drawLegendPointer(i.id);
             })
-        
+
         // Dibuja la legenda del Mapa
         drawMapLegend();
     })
@@ -187,7 +189,6 @@ function drawBarplot(i) {
     } else if (contagiados > 25000000 && contagiados <= 50000000) {
         max = 50000000
     }
-    console.log(max)
     y.domain([0, max]);
     // Asignando animación
     yAxis.transition().duration(1000).call(d3.axisLeft(y));
@@ -204,16 +205,26 @@ function drawBarplot(i) {
         .attr("height", d => height_bp - y(d.value))
         .attr("fill", "rgb(223, 163, 0, 0.863)")
 
+    //Asignando dinámicamente el título del gráfico    
+    d3.select("#barplotTitle")
+        .text(res.Country)
+        .attr("class", "legendTitle")
+
+    //Asignando dinámicamente el resumen del país
+    d3.select("#contagiados")
+        .text(parseInt(res.New_cases).toLocaleString('es-MX'))
+    d3.select("#fallecidos")
+        .text(parseInt(res.New_deaths).toLocaleString('es-MX'))
 }
 
 // Función encargada de dibujar la legenda del mapa
-function drawMapLegend(){
+function drawMapLegend() {
     /* -- Definición del gradiente de forma lineal -- */
     var def_lg = svg.append("defs")
         .append("linearGradient")
         .attr("id", "def_linear_gradient")
         .attr("x1", "0%").attr("y1", "0%")
-	    .attr("x2", "100%").attr("y2", "0%");
+        .attr("x2", "100%").attr("y2", "0%");
     // Color de finalización del gradiente
     def_lg.append("stop")
         .attr("offset", "0%")
@@ -229,30 +240,30 @@ function drawMapLegend(){
     /* -- Dibujando el rectángulo -- */
     svg_legend.append("rect")
         .attr("class", "legendRect")
-        .attr("x", -legendWidth/2)
+        .attr("x", -legendWidth / 2)
         .attr("y", 0)
         .attr("width", legendWidth)
         .attr("height", 5)
         .style("fill", "url(#def_linear_gradient)");
     /* -- */
-    
+
     /* -- Título de la leyenda -- */
     svg_legend.append("text")
         .attr("class", "legendTitle")
         .attr("x", 0)
         .attr("y", -5)
         .style("text-anchor", "middle")
-        .text("Cantidad de casos de COVID-19 2020-2021");
+        .text("03/01/2020 al 29/11/2021");
     /* -- */
 
     /* -- Leyenda de la escala de los datos -- */
     // Escala para cantidades
     var Leg_xScale = d3.scaleLinear()
-        .domain([0,50000000])
-        .range([-legendWidth/2, legendWidth/2])
+        .domain([0, 50000000])
+        .range([-legendWidth / 2, legendWidth / 2])
     // Axis para dar formato a los datos (abreviación de Millones)
-    var Leg_xAxis = d3.axisBottom(Leg_xScale).tickFormat(function(d){
-        return d/1000000 + "MM";
+    var Leg_xAxis = d3.axisBottom(Leg_xScale).tickFormat(function (d) {
+        return d / 1000000 + "MM";
     })
 
     //Configura el eje X
@@ -265,7 +276,7 @@ function drawMapLegend(){
 
 // Función drawLegendPointer: dibuja sobre la escala de color
 // un puntero con la cantidad de casos para una rápida identificación.
-function drawLegendPointer(i){
+function drawLegendPointer(i) {
     // Filtra los datos específicos del país seleccionado
     let res = COVID.find(pais => pais.Country_code === i);
     // El valor a representar en el apuntados, es la suma de los nuevos casos
@@ -273,7 +284,7 @@ function drawLegendPointer(i){
 
     /* -- Leyenda de la escala de los datos -- */
     var PtScale = d3.scaleLinear()
-        .range([-legendWidth/2, legendWidth/2])
+        .range([-legendWidth / 2, legendWidth / 2])
         .domain([0, 50000000]);
     // Definición del objeto apuntador (Diamante)
     var symb = d3.symbol().type(d3.symbolDiamond).size(30);
@@ -282,4 +293,8 @@ function drawLegendPointer(i){
         .attr("d", symb)
         .attr("fill", "black")
         .attr("transform", "translate(" + PtScale(value) + ", -2)");
+}
+
+function showTitleBarPlot(res) {
+
 }
